@@ -1,6 +1,10 @@
 {
-  "type":"module",
+  "type": "module",
   "dependencies": {
-    "openai": "^4.65.0"
+    "openai": "^4.65.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.1"
   }
 }
