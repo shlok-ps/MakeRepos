@@ -1,7 +1,9 @@
 {
   "type": "module",
   "dependencies": {
+    "csv": "^6.3.10",
     "openai": "^4.65.0",
+    "pg": "^8.13.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
