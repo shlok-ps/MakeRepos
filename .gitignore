@@ -134,3 +134,4 @@ node_modules
 package-lock.json
 OutDir*
 data/*
+report.*

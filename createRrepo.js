@@ -15,6 +15,16 @@ const getAPIResponse = (messages) => openAI.chat.completions.create({
     messages: messages 
 });
 
+const writeFileOrDirectory = (fileName, content) => {
+	const allFileParts = fileName.split('/');
+	if(allFileParts.length > 1){
+		fs.mkdir(directory, { recursive: true })
+		.then((d)=>fs.writeFile(fileName, content, (err)=>console.log(err)))
+		.catch((err) => console.error('Error creating directory:', err));
+	}else{
+		fs.writeFile(fileName, content, (err, data)=>console.log(err));
+	}
+}
 const getTextBw = (masterText, split1, split2) =>{
 	let text = masterText?.split(split1)[1] || '';
 	const splitted = text.split(split2);
@@ -25,9 +35,9 @@ const test = async () => {
 	const res = await dbClient.query("select * from ai_responses");
 	console.log(res.rows);
 }
-const insertToAI_Responses = async (sys_com, usr_com, response) => {
+const insertToAI_Responses = async (project, sys_com, usr_com, response, user) => {
 	try{
-		const res = await dbClient.query("insert into ai_responses (id, created_date, system_command, user_command, assistant_response ) values($1, $2, $3, $4, $5)",[crypto.randomUUID(), new Date().getTime(), sys_com, usr_com, response]);
+		const res = await dbClient.query(`insert into ai_responses(id, project_name, sys_command, usr_command, ai_response, "user") values($1, $2, $3, $4, $5, $6)`,[crypto.randomUUID(), project, sys_com, usr_com, response, user]);
 		console.log('res: ',res);
 	}catch(e){
 		console.error('Error: ',e);
@@ -52,15 +62,15 @@ const getMessages = async () => {
 						let usr_command = row['User Command'];
 						let previous_code = '';
 						if(lastCodeExecutionId != ''){
-							const res = await dbClient.query("select assistant_response from ai_responses where id = $1", [lastCodeExecutionId]);
-							const message = res.rows[0].assistant_response.choices[0].message.content;
+							const res = await dbClient.query("select ai_response from ai_responses where id = $1", [lastCodeExecutionId]);
+							const message = res.rows[0].ai_response.choices[0].message.content;
 							const {text} = getTextBw(message, "<CODE_BEGIN>", "<CODE_END>");
 							previous_code = text;
 						}
 						usr_command = "<CODE_BEGIN>"+previous_code+"<CODE_END> "+usr_command;
 						const apiResponse = await getAPIResponse(createMessagesArray(sys_command, usr_command));
 						console.log(apiResponse.choices[0].message);
-						const dbInsertRes = await insertToAI_Responses(sys_command, usr_command, apiResponse);
+						const dbInsertRes = await insertToAI_Responses("TimerMobileReactNative", sys_command, usr_command, apiResponse, "Punyashlok");
 						console.log(dbInsertRes);
 					}
 				}
