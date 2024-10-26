@@ -9,5 +9,8 @@
   },
   "devDependencies": {
     "tsx": "^4.19.1"
+  },
+  "bin":{
+	  "execute": "createRepo.js"
   }
 }

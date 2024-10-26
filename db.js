@@ -7,6 +7,5 @@ const client = new Client({
   port: 5432,
   database: 'makeRepos',
 })
-await client.connect()
 
 export default client;
